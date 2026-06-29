@@ -56,7 +56,12 @@ export function useExtension() {
 
     window.addEventListener("message", handler);
 
-    // Detect extension
+    // Detect extension — first check DOM stamp (injected at document_start by bridge),
+    // then fall back to PING/PONG in case the attribute isn't set yet.
+    if (document.documentElement.getAttribute("data-wsc-ext")) {
+      setStatus("connected");
+    }
+
     const detectTimeout = setTimeout(() => {
       setStatus("not_installed");
     }, 2_000);

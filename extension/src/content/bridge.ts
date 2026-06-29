@@ -4,6 +4,10 @@
  */
 import type { ExtMessage } from "../types";
 
+// Stamp the DOM so the page can detect the extension instantly, without
+// needing a round-trip through the service worker.
+document.documentElement.setAttribute("data-wsc-ext", "1.0.0");
+
 // Page → Extension
 window.addEventListener("message", (event) => {
   if (event.source !== window) return;
