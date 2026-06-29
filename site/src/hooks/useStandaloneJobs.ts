@@ -55,6 +55,7 @@ export function useStandaloneJobs() {
     }
 
     while (queue.length > 0) {
+      // Check abort at start of every iteration
       if (abortRef.current.get(config.id)) {
         patchJob(config.id, { status: "paused", queue: [...queue], visited: [...visited], results: [...results] });
         return;
@@ -102,10 +103,19 @@ export function useStandaloneJobs() {
         })
       );
 
+      // Check abort again AFTER the batch — don't overwrite "paused" status
+      if (abortRef.current.get(config.id)) {
+        patchJob(config.id, { status: "paused", queue: [...queue], visited: [...visited], results: [...results] });
+        return;
+      }
+
       patchJob(config.id, { visited: [...visited], queue: [...queue], results: [...results], status: "running" });
     }
 
-    patchJob(config.id, { status: "done", visited: [...visited], queue: [], results: [...results], finishedAt: Date.now() });
+    // Only mark done if not aborted
+    if (!abortRef.current.get(config.id)) {
+      patchJob(config.id, { status: "done", visited: [...visited], queue: [], results: [...results], finishedAt: Date.now() });
+    }
   }, []);
 
   function startJob(config: JobConfig) {
