@@ -177,28 +177,32 @@ export default function JobBuilder({ onSubmit }: Props) {
             </p>
             {fields.map((field, i) => (
               <div key={i} className="flex gap-2 items-center">
-                <input
-                  value={field.name}
-                  onChange={(e) => updateField(i, "name", e.target.value)}
-                  placeholder="Field name"
-                  className={`${inputCls} w-32`}
-                />
-                <input
-                  value={field.selector}
-                  onChange={(e) => updateField(i, "selector", e.target.value)}
-                  placeholder="CSS selector"
-                  className={`${inputCls} flex-1`}
-                />
-                <input
-                  value={field.attribute ?? ""}
-                  onChange={(e) => updateField(i, "attribute", e.target.value)}
-                  placeholder="attr (optional)"
-                  className={`${inputCls} w-28`}
-                />
+                <div className="flex-1 flex flex-col gap-1">
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wide">
+                    Field {i + 1} — CSS Selector
+                  </label>
+                  <input
+                    value={field.selector}
+                    onChange={(e) => updateField(i, "selector", e.target.value)}
+                    placeholder="e.g. .titleline > a"
+                    className={inputCls}
+                  />
+                </div>
+                <div className="w-32 flex flex-col gap-1">
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wide">
+                    Column name
+                  </label>
+                  <input
+                    value={field.name}
+                    onChange={(e) => updateField(i, "name", e.target.value)}
+                    placeholder="auto"
+                    className={inputCls}
+                  />
+                </div>
                 <button
                   type="button"
                   onClick={() => removeField(i)}
-                  className="text-gray-500 hover:text-red-400 px-1"
+                  className="text-gray-500 hover:text-red-400 px-1 mt-4"
                 >
                   ✕
                 </button>
