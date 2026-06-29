@@ -163,35 +163,43 @@ export default function Dashboard() {
           <div>
             <h2 className="font-semibold mb-1">Groq API Key</h2>
             <p className="text-xs text-gray-400 mb-3">
-              Required only for AI-powered extraction. Get a free key at{" "}
-              <a
-                href="https://console.groq.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-indigo-400 hover:underline"
-              >
-                console.groq.com
-              </a>
+              Required only for AI-powered extraction.
             </p>
-            <div className="flex gap-2">
-              <input
-                type="password"
-                value={groqKey}
-                onChange={(e) => setGroqKey(e.target.value)}
-                placeholder="gsk_..."
-                className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-white"
-              />
-              <button
-                onClick={saveGroqKey}
-                disabled={!groqKey}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 rounded text-sm font-medium transition-colors text-white"
-              >
-                {keySaved ? "Saved ✓" : "Save"}
-              </button>
-            </div>
-            <p className="text-xs text-gray-600 mt-2">
-              Saved in your browser's local storage. Sent only to Groq's servers during AI extraction.
-            </p>
+            {import.meta.env.VITE_GROQ_API_KEY ? (
+              <div className="flex items-center gap-2 px-3 py-2 bg-green-900/20 border border-green-800/40 rounded text-sm text-green-400">
+                <span>✓</span>
+                <span>API key configured via GitHub secret — no action needed.</span>
+              </div>
+            ) : (
+              <>
+                <p className="text-xs text-gray-500 mb-2">
+                  Add <code className="bg-gray-800 px-1 rounded">VITE_GROQ_API_KEY</code> as a GitHub repository secret to make this permanent.
+                  Or paste a key below for this session only.{" "}
+                  <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">
+                    Get free key →
+                  </a>
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    type="password"
+                    value={groqKey}
+                    onChange={(e) => setGroqKey(e.target.value)}
+                    placeholder="gsk_..."
+                    className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-white"
+                  />
+                  <button
+                    onClick={saveGroqKey}
+                    disabled={!groqKey}
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 rounded text-sm font-medium transition-colors text-white"
+                  >
+                    {keySaved ? "Saved ✓" : "Save"}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-600 mt-2">
+                  Saved in your browser's local storage. Cleared when you clear history.
+                </p>
+              </>
+            )}
           </div>
 
           <div className="border-t border-gray-800 pt-6">
