@@ -4,9 +4,6 @@
  */
 import type { ExtMessage } from "../types";
 
-// Announce presence so the page knows the extension is installed
-window.postMessage({ source: "WSC_EXT", type: "PONG", version: "1.0.0" }, "*");
-
 // Page → Extension
 window.addEventListener("message", (event) => {
   if (event.source !== window) return;

@@ -28,7 +28,8 @@ export function useExtension() {
       if (event.source !== window) return;
       if (!event.data || event.data.source !== "WSC_EXT") return;
 
-      const msg = event.data.payload as ExtMessage & { _id?: string };
+      const msg = event.data.payload as (ExtMessage & { _id?: string }) | undefined;
+      if (!msg) return;
 
       // Handle broadcasts (no _id)
       if (!msg._id) {
@@ -63,7 +64,7 @@ export function useExtension() {
     window.postMessage({ source: "WSC_PAGE", payload: { type: "PING" } }, "*");
 
     window.addEventListener("message", function onPong(e) {
-      if (e.data?.source === "WSC_EXT" && e.data?.type === "PONG") {
+      if (e.data?.source === "WSC_EXT" && e.data?.payload?.type === "PONG") {
         clearTimeout(detectTimeout);
         setStatus("connected");
         window.removeEventListener("message", onPong);
