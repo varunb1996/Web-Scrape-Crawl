@@ -37,7 +37,7 @@ export function extractWithSelectors(
   }
 
   const columns: Record<string, string[]> = {};
-  let maxLen = 1;
+  let maxLen = 0;
   for (const field of fields) {
     const nodes = Array.from(doc.querySelectorAll(field.selector));
     const values = nodes.map((el) =>

@@ -17,7 +17,7 @@ export default function JobBuilder({ onSubmit }: Props) {
   const [includePattern, setIncludePattern] = useState("");
   const [excludePattern, setExcludePattern] = useState("");
   const [mode, setMode] = useState<ExtractionMode>("rule");
-  const [fields, setFields] = useState<SelectorField[]>([{ name: "title", selector: "h1" }]);
+  const [fields, setFields] = useState<SelectorField[]>([]);
   const [aiPrompt, setAiPrompt] = useState("");
 
   function addField() {
@@ -166,7 +166,10 @@ export default function JobBuilder({ onSubmit }: Props) {
 
         {(mode === "rule" || mode === "both") && (
           <div className="space-y-2">
-            <p className="text-xs text-gray-500">CSS selector fields to extract:</p>
+            <p className="text-xs text-gray-500">
+              CSS selector fields to extract.{" "}
+              <span className="text-gray-400">Leave empty to auto-extract page title, description, and headings.</span>
+            </p>
             {fields.map((field, i) => (
               <div key={i} className="flex gap-2 items-center">
                 <input
