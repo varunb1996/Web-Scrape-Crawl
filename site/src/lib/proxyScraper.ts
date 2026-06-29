@@ -104,6 +104,13 @@ export async function fetchRobotsTxt(origin: string): Promise<Set<string>> {
   return disallowed;
 }
 
+function htmlToText(html: string): string {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  // Remove script, style, nav, header, footer noise
+  doc.querySelectorAll("script,style,nav,header,footer,aside,[role=navigation]").forEach((el) => el.remove());
+  return (doc.body?.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 12_000);
+}
+
 export async function aiExtractGroq(
   html: string,
   prompt: string,
@@ -111,7 +118,7 @@ export async function aiExtractGroq(
   url: string,
   depth: number
 ): Promise<Array<{ url: string; depth: number; data: Record<string, string>; scrapedAt: number }>> {
-  const truncated = html.slice(0, 12_000);
+  const truncated = htmlToText(html);
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
