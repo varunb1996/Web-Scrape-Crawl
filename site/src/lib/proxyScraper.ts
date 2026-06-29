@@ -106,9 +106,18 @@ export async function fetchRobotsTxt(origin: string): Promise<Set<string>> {
 
 function htmlToText(html: string): string {
   const doc = new DOMParser().parseFromString(html, "text/html");
-  // Remove script, style, nav, header, footer noise
-  doc.querySelectorAll("script,style,nav,header,footer,aside,[role=navigation]").forEach((el) => el.remove());
-  return (doc.body?.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 12_000);
+  // Remove noise elements
+  doc.querySelectorAll("script,style,nav,header,footer,aside,[role=navigation],noscript").forEach((el) => el.remove());
+  // Prefer main content containers used by common sites
+  const main =
+    doc.querySelector("main") ??
+    doc.querySelector("article") ??
+    doc.querySelector("#mw-content-text") ??   // Wikipedia
+    doc.querySelector("#content") ??
+    doc.querySelector(".content") ??
+    doc.querySelector("#main-content") ??
+    doc.body;
+  return (main?.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 12_000);
 }
 
 export async function aiExtractGroq(
