@@ -17,11 +17,13 @@ export default function Dashboard() {
   const jobs: JobState[] = extConnected ? ext.jobs : standalone.jobs;
 
   const [panel, setPanel] = useState<Panel>("jobs");
-  const [groqKey, setGroqKey] = useState(() => localStorage.getItem("wsc_groq_key") ?? "");
+  const [groqKey, setGroqKey] = useState(
+    () => localStorage.getItem("wsc_groq_key") ?? (import.meta.env.VITE_GROQ_API_KEY as string) ?? ""
+  );
   const [keySaved, setKeySaved] = useState(false);
 
   async function handleStartJob(config: JobConfig) {
-    const key = localStorage.getItem("wsc_groq_key") ?? "";
+    const key = localStorage.getItem("wsc_groq_key") ?? (import.meta.env.VITE_GROQ_API_KEY as string) ?? "";
     const enriched = { ...config, groqApiKey: key };
     if (extConnected) {
       await ext.send({ type: "START_JOB", config: enriched });
