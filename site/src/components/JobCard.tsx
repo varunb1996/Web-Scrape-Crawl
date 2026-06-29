@@ -104,6 +104,24 @@ export default function JobCard({ job, onPause, onResume, onDelete }: Props) {
             <Stat label="Delay" value={`${job.config.delayMs}ms`} />
           </div>
 
+          {/* Selectors — shows exactly what will be extracted */}
+          {job.config.fields.length > 0 ? (
+            <div className="text-xs">
+              <div className="text-gray-600 text-[10px] uppercase tracking-wide mb-1">Selectors</div>
+              <div className="flex flex-wrap gap-2">
+                {job.config.fields.map((f, i) => (
+                  <span key={i} className="bg-gray-800 text-gray-300 px-2 py-1 rounded font-mono">
+                    {f.name}: <span className="text-indigo-400">{f.selector}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-xs text-gray-600">
+              Selectors: <span className="text-gray-400">auto (page title + meta description)</span>
+            </div>
+          )}
+
           {/* Error */}
           {job.errorMessage && (
             <p className="text-xs text-red-400 bg-red-900/20 px-3 py-2 rounded">

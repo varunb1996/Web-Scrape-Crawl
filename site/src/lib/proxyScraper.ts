@@ -4,12 +4,26 @@
  * JS-heavy SPAs may return empty content (use the extension for those).
  */
 
-const CORS_PROXY = "https://corsproxy.io/?";
+const CORS_PROXIES = [
+  "https://corsproxy.io/?",
+  "https://api.allorigins.win/raw?url=",
+];
 
 export async function fetchHtml(url: string): Promise<string> {
-  const res = await fetch(CORS_PROXY + encodeURIComponent(url));
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-  return res.text();
+  let lastError: Error | null = null;
+  for (const proxy of CORS_PROXIES) {
+    try {
+      const res = await fetch(proxy + encodeURIComponent(url));
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      // Detect bot/CAPTCHA walls (very short responses are usually error pages)
+      if (text.length > 500) return text;
+      throw new Error("Response too short — likely a bot detection page");
+    } catch (e) {
+      lastError = e as Error;
+    }
+  }
+  throw lastError ?? new Error(`Failed to fetch ${url}`);
 }
 
 // DOMParser elements don't support innerText (no layout engine) — always use textContent
