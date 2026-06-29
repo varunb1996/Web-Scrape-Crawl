@@ -90,6 +90,7 @@ chrome.runtime.onMessage.addListener((message: ExtMessage, _sender, sendResponse
               type: "AI_EXTRACT",
               html: cleanText,
               prompt: config.aiPrompt ?? "Extract all meaningful content",
+              groqApiKey: config.groqApiKey,
               url,
               depth,
             });

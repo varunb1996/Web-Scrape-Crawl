@@ -10,13 +10,14 @@ type Panel = "new" | "jobs" | "settings";
 export default function Dashboard() {
   const { status, jobs, send } = useExtension();
   const [panel, setPanel] = useState<Panel>("jobs");
-  const [groqKey, setGroqKey] = useState("");
+  const [groqKey, setGroqKey] = useState(() => localStorage.getItem("wsc_groq_key") ?? "");
   const [keySaved, setKeySaved] = useState(false);
 
   const connected = status === "connected";
 
   async function handleStartJob(config: JobConfig) {
-    await send({ type: "START_JOB", config });
+    const key = localStorage.getItem("wsc_groq_key") ?? "";
+    await send({ type: "START_JOB", config: { ...config, groqApiKey: key } });
     setPanel("jobs");
   }
 
@@ -32,8 +33,8 @@ export default function Dashboard() {
     await send({ type: "DELETE_JOB", jobId });
   }
 
-  async function saveGroqKey() {
-    await send({ type: "SET_GROQ_KEY", key: groqKey });
+  function saveGroqKey() {
+    localStorage.setItem("wsc_groq_key", groqKey);
     setKeySaved(true);
     setTimeout(() => setKeySaved(false), 2000);
   }
@@ -130,14 +131,14 @@ export default function Dashboard() {
               />
               <button
                 onClick={saveGroqKey}
-                disabled={!connected || !groqKey}
+                disabled={!groqKey}
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 rounded text-sm font-medium transition-colors"
               >
                 {keySaved ? "Saved ✓" : "Save"}
               </button>
             </div>
             <p className="text-xs text-gray-600 mt-2">
-              Key is stored locally in the extension, never sent anywhere except Groq.
+              Key is saved in your browser's local storage and sent only to Groq's servers when using AI extraction.
             </p>
           </div>
         </div>

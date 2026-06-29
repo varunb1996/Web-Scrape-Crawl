@@ -289,9 +289,8 @@ async function getLinksFromUrl(url: string, config: JobConfig): Promise<string[]
 
 // ── Groq AI extraction (called from content script via message) ──────────────
 
-async function aiExtract(html: string, prompt: string): Promise<Record<string, string>[]> {
-  const { groqKey } = await chrome.storage.local.get("groqKey") as { groqKey?: string };
-  if (!groqKey) throw new Error("No Groq API key set. Open extension settings to add one.");
+async function aiExtract(html: string, prompt: string, groqKey?: string): Promise<Record<string, string>[]> {
+  if (!groqKey) throw new Error("No Groq API key set. Go to Dashboard → Settings to add one.");
 
   const groq = new Groq({ apiKey: groqKey, dangerouslyAllowBrowser: false });
   const truncated = html.slice(0, 12_000); // stay within token limits
@@ -390,9 +389,9 @@ chrome.runtime.onMessage.addListener((message: ExtMessage, _sender, sendResponse
         break;
 
       case "AI_EXTRACT" as any: {
-        const { html, prompt, url, depth } = message as any;
+        const { html, prompt, url, depth, groqApiKey } = message as any;
         try {
-          const rawRows = await aiExtract(html, prompt);
+          const rawRows = await aiExtract(html, prompt, groqApiKey);
           const rows: ScrapedRow[] = rawRows.map((data) => ({
             url,
             depth,

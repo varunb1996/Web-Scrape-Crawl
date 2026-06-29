@@ -20,6 +20,7 @@ export interface JobConfig {
   extractionMode: ExtractionMode;
   fields: SelectorField[];
   aiPrompt?: string;
+  groqApiKey?: string; // passed with job so extension doesn't need separate storage
   createdAt: number;
 }
 
