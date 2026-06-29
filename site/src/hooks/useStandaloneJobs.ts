@@ -75,14 +75,20 @@ export function useStandaloneJobs() {
               pageRows = extractWithSelectors(html, config.fields, url, depth);
             }
             if ((config.extractionMode === "ai" || config.extractionMode === "both") && config.groqApiKey) {
-              const aiRows = await aiExtractGroq(
-                html,
-                config.aiPrompt ?? "Extract all meaningful content",
-                config.groqApiKey,
-                url,
-                depth
-              );
-              pageRows = config.extractionMode === "both" ? [...pageRows, ...aiRows] : aiRows;
+              try {
+                const aiRows = await aiExtractGroq(
+                  html,
+                  config.aiPrompt || "Extract all headings, paragraphs, links, and key data as structured rows",
+                  config.groqApiKey,
+                  url,
+                  depth
+                );
+                pageRows = config.extractionMode === "both" ? [...pageRows, ...aiRows] : aiRows;
+              } catch (aiErr) {
+                patchJob(config.id, { errorMessage: `AI extraction failed: ${(aiErr as Error).message}` });
+              }
+            } else if ((config.extractionMode === "ai" || config.extractionMode === "both") && !config.groqApiKey) {
+              patchJob(config.id, { errorMessage: "No Groq API key — go to Settings to add one" });
             }
             results.push(...pageRows);
 
