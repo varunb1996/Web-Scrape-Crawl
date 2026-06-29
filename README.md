@@ -24,25 +24,20 @@ A state-of-the-art web scraping and crawling tool that runs entirely in your bro
 2. Click **Dashboard → + New Job**
 3. Enter a start URL (e.g. `https://news.ycombinator.com`)
 4. Choose extraction mode:
-   - **Rule-Based**: enter a CSS selector (e.g. `a.storylink` for HN titles)
+   - **Rule-Based**: click **+ Add field**, enter a CSS selector (e.g. `.titleline > a` for HN titles)
    - **AI (Groq)**: describe what to extract in plain English
 5. Click **Start Scraping Job**
 6. Watch results appear live — then export as CSV or JSON
 
-> The app runs in **standalone mode** by default, fetching pages through a CORS proxy. This works for most public websites. For JavaScript-rendered sites (SPAs), install the browser extension below.
+> The app runs in **standalone mode**, fetching pages through a CORS proxy. This works for most public websites. For JavaScript-rendered sites (SPAs), install the browser extension below.
 
 ---
 
 ## AI Extraction Setup (Free)
 
-To use AI-powered extraction:
+AI extraction is pre-configured — no setup needed if you're using the live app. The Groq API key is already baked into the build.
 
-1. Sign up at **[console.groq.com](https://console.groq.com)** (free, no credit card)
-2. Go to **API Keys** → **Create API Key** → copy the key (starts with `gsk_`)
-3. In the dashboard, go to **Settings** → paste your key → click **Save**
-4. Now select **AI (Groq)** or **Both** as the extraction mode when creating a job
-
-The key is saved in your browser's local storage and sent only to Groq's servers.
+If you're running your own fork, add `VITE_GROQ_API_KEY` as a repository secret in GitHub → Settings → Secrets and variables → Actions, then push to trigger a new build.
 
 ---
 
@@ -52,17 +47,15 @@ The extension is needed only for JavaScript-rendered websites (React, Vue, Angul
 
 ### Install on Chrome
 
-1. Download the latest release: [Releases →](https://github.com/varunb1996/Web-Scrape-Crawl/releases)
-2. Unzip the downloaded file
-3. Open Chrome → type `chrome://extensions` in the address bar → press Enter
-4. Toggle **Developer mode** ON (top-right corner)
-5. Click **Load unpacked** → select the unzipped `chrome-mv3` folder
-6. The 🕷️ icon appears in your toolbar
-
-Or load directly from the source (after cloning this repo):
-```
-Load unpacked → select: extension/.output/chrome-mv3/
-```
+1. Clone this repo and build the extension:
+   ```bash
+   npm install
+   npm run build:ext   # → extension/.output/chrome-mv3/
+   ```
+2. Open Chrome → type `chrome://extensions` in the address bar → press Enter
+3. Toggle **Developer mode** ON (top-right corner)
+4. Click **Load unpacked** → select the `extension/.output/chrome-mv3/` folder
+5. The 🕷️ icon appears in your toolbar
 
 ### Install on Microsoft Edge
 
@@ -72,8 +65,6 @@ Edge is built on Chromium and supports Chrome extensions natively:
 2. Toggle **Developer mode** ON (bottom-left)
 3. Click **Load unpacked** → select the same `chrome-mv3` folder
 4. Done — the extension works identically in Edge
-
-> You can also enable "Allow extensions from other stores" in Edge settings to install directly from the Chrome Web Store when the extension is published there.
 
 ---
 
@@ -85,26 +76,25 @@ Edge is built on Chromium and supports Chrome extensions natively:
 | Start URL | `https://news.ycombinator.com` |
 | Max depth | `0` (single page) |
 | Extraction | Rule-Based |
-| Field name | `title` |
-| CSS selector | `span.titleline > a` |
+| CSS selector | `.titleline > a` → column name: `title` |
+| CSS selector | `.score` → column name: `score` |
 
-### 2. Wikipedia article text (AI)
+### 2. Wikipedia article sections (AI)
 | Field | Value |
 |---|---|
 | Start URL | `https://en.wikipedia.org/wiki/Web_scraping` |
 | Max depth | `0` |
 | Extraction | AI (Groq) |
-| Prompt | `Extract all section headings and their first paragraph` |
+| Prompt | `Extract each main section heading and a brief summary of its content` |
 
-### 3. Multi-page crawl
+### 3. Multi-page book crawl (Rule-Based)
 | Field | Value |
 |---|---|
 | Start URL | `https://books.toscrape.com` |
 | Max depth | `2` |
 | Stay on domain | ✓ |
-| Extraction | Rule-Based |
-| Field: `title` | `article.product_pod h3 a` |
-| Field: `price` | `article.product_pod .price_color` |
+| CSS selector | `article.product_pod h3 a` → column name: `title` |
+| CSS selector | `article.product_pod .price_color` → column name: `price` |
 
 ---
 
@@ -114,10 +104,10 @@ Edge is built on Chromium and supports Chrome extensions natively:
 Browser (you)
     │
     ├─ Standalone mode (default)
-    │   └─ fetch via corsproxy.io → parse HTML → extract data → show results
+    │   └─ fetch via CORS proxy → parse HTML → extract data → show results
     │
     └─ Extension mode (optional, for JS sites)
-        └─ Chrome/Edge extension → opens tab → injects content script
+        └─ Chrome/Edge extension → injects content script
            → renders JS → extracts data → sends to dashboard
 ```
 
@@ -131,7 +121,7 @@ Browser (you)
 | Hosting | GitHub Pages (static, free) |
 | Browser Extension | WXT (Manifest V3) + React |
 | AI Extraction | Groq API — Llama-3.3-70b-versatile (free tier) |
-| CORS Proxy | corsproxy.io (for standalone mode) |
+| CORS Proxy | corsproxy.io with allorigins.win fallback |
 
 ---
 
@@ -163,8 +153,8 @@ The GitHub Actions workflow automatically deploys `site/dist/` to GitHub Pages o
 
 ## Limitations
 
-- **CORS proxy**: corsproxy.io may occasionally be slow or rate-limit heavy usage. The extension bypasses this entirely.
+- **CORS proxy**: corsproxy.io or allorigins.win may occasionally be slow or rate-limited. The extension bypasses this entirely.
 - **JS-heavy sites**: Without the extension, SPAs that load content via JavaScript will return empty results.
-- **Storage**: Job results are stored in browser memory (standalone) or `chrome.storage.local` (extension, ~10MB limit). Export frequently for large crawls.
+- **Storage**: Job results are stored in browser memory — export frequently for large crawls.
 - **Groq free tier**: ~30 requests/minute. Use a delay of 2000ms+ for AI extraction jobs.
 - **robots.txt**: The tool respects `Disallow` rules by default.
