@@ -3,12 +3,11 @@ import type { JobConfig, SelectorField, ExtractionMode } from "../types";
 
 interface Props {
   onSubmit: (config: JobConfig) => void;
-  disabled?: boolean;
 }
 
 const DEFAULT_DELAY = 1000;
 
-export default function JobBuilder({ onSubmit, disabled }: Props) {
+export default function JobBuilder({ onSubmit }: Props) {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
   const [depth, setDepth] = useState(0);
@@ -222,8 +221,7 @@ export default function JobBuilder({ onSubmit, disabled }: Props) {
 
       <button
         type="submit"
-        disabled={disabled}
-        className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-semibold transition-colors"
+        className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-semibold transition-colors"
       >
         Start Scraping Job
       </button>
