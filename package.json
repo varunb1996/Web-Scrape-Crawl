@@ -1,0 +1,15 @@
+{
+  "name": "web-scrape-crawl",
+  "private": true,
+  "workspaces": [
+    "extension",
+    "site"
+  ],
+  "scripts": {
+    "dev:ext": "npm run dev --workspace=extension",
+    "dev:site": "npm run dev --workspace=site",
+    "build:ext": "npm run build --workspace=extension",
+    "build:site": "npm run build --workspace=site",
+    "build": "npm run build:ext && npm run build:site"
+  }
+}
