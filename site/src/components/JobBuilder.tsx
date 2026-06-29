@@ -33,6 +33,7 @@ export default function JobBuilder({ onSubmit }: Props) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!url.trim()) return;
+    console.log("[WSC] fields state at submit:", JSON.stringify(fields));
     const config: JobConfig = {
       id: `job_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       name: name.trim() || new URL(url).hostname,
