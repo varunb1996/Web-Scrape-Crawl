@@ -44,7 +44,11 @@ export default function JobBuilder({ onSubmit }: Props) {
       concurrency,
       delayMs,
       extractionMode: mode,
-      fields: mode !== "ai" ? fields.filter((f) => f.name && f.selector) : [],
+      fields: mode !== "ai"
+        ? fields
+            .filter((f) => f.selector.trim())
+            .map((f, i) => ({ ...f, name: f.name.trim() || `field_${i + 1}` }))
+        : [],
       aiPrompt: mode !== "rule" ? aiPrompt.trim() : undefined,
       createdAt: Date.now(),
     };
