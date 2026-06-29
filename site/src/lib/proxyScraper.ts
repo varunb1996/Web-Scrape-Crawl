@@ -12,6 +12,11 @@ export async function fetchHtml(url: string): Promise<string> {
   return res.text();
 }
 
+// DOMParser elements don't support innerText (no layout engine) — always use textContent
+function getText(el: Element): string {
+  return el.textContent?.trim() ?? "";
+}
+
 export function extractWithSelectors(
   html: string,
   fields: Array<{ name: string; selector: string; attribute?: string }>,
@@ -25,7 +30,7 @@ export function extractWithSelectors(
       url, depth, scrapedAt: Date.now(),
       data: {
         title: doc.title,
-        h1: (doc.querySelector("h1") as HTMLElement)?.innerText?.trim() ?? "",
+        h1: getText(doc.querySelector("h1") ?? document.createElement("h1")),
         description: (doc.querySelector('meta[name="description"]') as HTMLMetaElement)?.content ?? "",
       },
     }];
@@ -37,8 +42,8 @@ export function extractWithSelectors(
     const nodes = Array.from(doc.querySelectorAll(field.selector));
     const values = nodes.map((el) =>
       field.attribute
-        ? (el as HTMLElement).getAttribute(field.attribute) ?? ""
-        : (el as HTMLElement).innerText?.trim() ?? el.textContent?.trim() ?? ""
+        ? el.getAttribute(field.attribute) ?? ""
+        : getText(el)
     );
     columns[field.name] = values;
     if (values.length > maxLen) maxLen = values.length;
