@@ -13,8 +13,9 @@ export default function Dashboard() {
 
   const extConnected = ext.status === "connected";
 
-  // Unified job list — extension jobs take priority when connected
-  const jobs: JobState[] = extConnected ? ext.jobs : standalone.jobs;
+  // Always use standalone jobs for crawling (reliable CORS proxy path).
+  // Extension detection is kept for future JS-rendering enhancements.
+  const jobs: JobState[] = standalone.jobs;
 
   const [panel, setPanel] = useState<Panel>("jobs");
   const [groqKey, setGroqKey] = useState(
@@ -24,37 +25,20 @@ export default function Dashboard() {
 
   async function handleStartJob(config: JobConfig) {
     const key = localStorage.getItem("wsc_groq_key") ?? (import.meta.env.VITE_GROQ_API_KEY as string) ?? "";
-    const enriched = { ...config, groqApiKey: key };
-    if (extConnected) {
-      await ext.send({ type: "START_JOB", config: enriched });
-    } else {
-      standalone.startJob(enriched);
-    }
+    standalone.startJob({ ...config, groqApiKey: key });
     setPanel("jobs");
   }
 
-  async function handlePause(job: JobState) {
-    if (extConnected) {
-      await ext.send({ type: "PAUSE_JOB", jobId: job.config.id });
-    } else {
-      standalone.pauseJob(job.config.id);
-    }
+  function handlePause(job: JobState) {
+    standalone.pauseJob(job.config.id);
   }
 
-  async function handleResume(job: JobState) {
-    if (extConnected) {
-      await ext.send({ type: "RESUME_JOB", jobId: job.config.id });
-    } else {
-      standalone.resumeJob(job.config.id);
-    }
+  function handleResume(job: JobState) {
+    standalone.resumeJob(job.config.id);
   }
 
-  async function handleDelete(job: JobState) {
-    if (extConnected) {
-      await ext.send({ type: "DELETE_JOB", jobId: job.config.id });
-    } else {
-      standalone.deleteJob(job.config.id);
-    }
+  function handleDelete(job: JobState) {
+    standalone.deleteJob(job.config.id);
   }
 
   function saveGroqKey() {

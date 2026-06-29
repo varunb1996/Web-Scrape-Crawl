@@ -5,7 +5,7 @@ interface Props {
   onSubmit: (config: JobConfig) => void;
 }
 
-const DEFAULT_DELAY = 1000;
+const DEFAULT_DELAY = 500;
 
 export default function JobBuilder({ onSubmit }: Props) {
   const [name, setName] = useState("");
